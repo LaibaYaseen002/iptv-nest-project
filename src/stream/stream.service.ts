@@ -17,4 +17,16 @@ export class StreamService {
   async create(createStreamDto: CreateStreamDto): Promise<Stream> {
     return this.streamModel.create(createStreamDto);
   }
+  async update(
+    id: string,
+    updateStreamDto: UpdateStreamDto,
+  ): Promise<Stream | null> {
+    return this.streamModel.findByIdAndUpdate(id, updateStreamDto, {
+      new: true,
+    });
+  }
+
+  async delete(id: string): Promise<null> {
+    return this.streamModel.findByIdAndDelete(id);
+  }
 }

@@ -17,4 +17,14 @@ export class GenreService {
   async create(createGenreDto: CreateGenreDto): Promise<Genre> {
     return this.genreModel.create(createGenreDto);
   }
+  async update(
+    id: string,
+    updateGenreDto: UpdateGenreDto,
+  ): Promise<Genre | null> {
+    return this.genreModel.findByIdAndUpdate(id, updateGenreDto, { new: true });
+  }
+
+  async delete(id: string): Promise<null> {
+    return this.genreModel.findByIdAndDelete(id);
+  }
 }

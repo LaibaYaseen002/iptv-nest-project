@@ -17,4 +17,16 @@ export class SeriesService {
   async create(createSeriesDto: CreateSeriesDto): Promise<Series> {
     return this.seriesModel.create(createSeriesDto);
   }
+  async update(
+    id: string,
+    updateSeriesDto: UpdateSeriesDto,
+  ): Promise<Series | null> {
+    return this.seriesModel.findByIdAndUpdate(id, updateSeriesDto, {
+      new: true,
+    });
+  }
+
+  async delete(id: string): Promise<null> {
+    return this.seriesModel.findByIdAndDelete(id);
+  }
 }

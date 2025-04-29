@@ -23,4 +23,15 @@ export class SeriesController {
   async create(@Body() createSeriesDto: CreateSeriesDto) {
     return this.seriesService.create(createSeriesDto);
   }
+  async update(
+    @Param('id') id: string,
+    @Body() updateSeriesDto: UpdateSeriesDto,
+  ) {
+    return this.seriesService.update(id, updateSeriesDto);
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
+    return this.seriesService.delete(id);
+  }
 }

@@ -23,4 +23,15 @@ export class StreamController {
   async create(@Body() createStreamDto: CreateStreamDto) {
     return this.streamService.create(createStreamDto);
   }
+  async update(
+    @Param('id') id: string,
+    @Body() updateStreamDto: UpdateStreamDto,
+  ) {
+    return this.streamService.update(id, updateStreamDto);
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
+    return this.streamService.delete(id);
+  }
 }

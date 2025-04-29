@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsString, IsOptional, IsDate } from 'class-validator';
-
+import { Type } from 'class-transformer';
 export class CreateSeriesDto {
   @IsNotEmpty()
   @IsString()
@@ -11,6 +11,7 @@ export class CreateSeriesDto {
 
   @IsOptional()
   @IsDate()
+  @Type(() => Date)
   releaseDate?: Date;
 }
 
@@ -25,5 +26,6 @@ export class UpdateSeriesDto {
 
   @IsOptional()
   @IsDate()
+  @Type(() => Date)
   releaseDate?: Date;
 }

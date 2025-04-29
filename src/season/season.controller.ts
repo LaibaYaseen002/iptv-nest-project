@@ -23,4 +23,15 @@ export class SeasonController {
   async create(@Body() createSeasonDto: CreateSeasonDto) {
     return this.seasonService.create(createSeasonDto);
   }
+  async update(
+    @Param('id') id: string,
+    @Body() updateSeasonDto: UpdateSeasonDto,
+  ) {
+    return this.seasonService.update(id, updateSeasonDto);
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
+    return this.seasonService.delete(id);
+  }
 }

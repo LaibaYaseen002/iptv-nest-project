@@ -6,6 +6,7 @@ import {
   CreateGenreSeriesDto,
   UpdateGenreSeriesDto,
 } from './dto/genreSeries.dto';
+import { Episode } from 'src/episode/episode.model';
 
 @Injectable()
 export class GenreSeriesService {
@@ -22,5 +23,17 @@ export class GenreSeriesService {
     createGenreSeriesDto: CreateGenreSeriesDto,
   ): Promise<GenreSeries> {
     return this.genreSeriesModel.create(createGenreSeriesDto);
+  }
+  async update(
+    id: string,
+    updateGenreSeriesDto: UpdateGenreSeriesDto,
+  ): Promise<GenreSeries | null> {
+    return this.genreSeriesModel.findByIdAndUpdate(id, updateGenreSeriesDto, {
+      new: true,
+    });
+  }
+
+  async delete(id: string): Promise<null> {
+    return this.genreSeriesModel.findByIdAndDelete(id);
   }
 }

@@ -23,4 +23,16 @@ export class EpisodeController {
   async create(@Body() createEpisodeDto: CreateEpisodeDto) {
     return this.episodeService.create(createEpisodeDto);
   }
+  @Patch(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() updateEpisodeDto: UpdateEpisodeDto,
+  ) {
+    return this.episodeService.update(id, updateEpisodeDto);
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
+    return this.episodeService.delete(id);
+  }
 }

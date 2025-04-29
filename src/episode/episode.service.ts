@@ -17,4 +17,16 @@ export class EpisodeService {
   async create(createEpisodeDto: CreateEpisodeDto): Promise<Episode> {
     return this.episodeModel.create(createEpisodeDto);
   }
+  async update(
+    id: string,
+    updateEpisodeDto: UpdateEpisodeDto,
+  ): Promise<Episode | null> {
+    return this.episodeModel.findByIdAndUpdate(id, updateEpisodeDto, {
+      new: true,
+    });
+  }
+
+  async delete(id: string): Promise<null> {
+    return this.episodeModel.findByIdAndDelete(id);
+  }
 }

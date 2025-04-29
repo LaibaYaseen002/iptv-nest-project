@@ -15,4 +15,11 @@ export class FileService {
   async create(createFileDto: CreateFileDto): Promise<File> {
     return this.fileModel.create(createFileDto);
   }
+  async update(id: string, updateFileDto: UpdateFileDto): Promise<File | null> {
+    return this.fileModel.findByIdAndUpdate(id, updateFileDto, { new: true });
+  }
+
+  async delete(id: string): Promise<null> {
+    return this.fileModel.findByIdAndDelete(id);
+  }
 }

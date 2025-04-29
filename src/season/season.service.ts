@@ -17,4 +17,16 @@ export class SeasonService {
   async create(createSeasonDto: CreateSeasonDto): Promise<Season> {
     return this.seasonModel.create(createSeasonDto);
   }
+  async update(
+    id: string,
+    updateSeasonDto: UpdateSeasonDto,
+  ): Promise<Season | null> {
+    return this.seasonModel.findByIdAndUpdate(id, updateSeasonDto, {
+      new: true,
+    });
+  }
+
+  async delete(id: string): Promise<null> {
+    return this.seasonModel.findByIdAndDelete(id);
+  }
 }

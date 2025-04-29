@@ -26,4 +26,16 @@ export class GenreSeriesController {
   async create(@Body() createGenreSeriesDto: CreateGenreSeriesDto) {
     return this.genreSeriesService.create(createGenreSeriesDto);
   }
+  @Patch(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() updateGenreSeriesDto: UpdateGenreSeriesDto,
+  ) {
+    return this.genreSeriesService.update(id, updateGenreSeriesDto);
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
+    return this.genreSeriesService.delete(id);
+  }
 }
