@@ -1,32 +1,47 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Series, SeriesDocument } from './series.model';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Series } from './series.model';
 import { CreateSeriesDto, UpdateSeriesDto } from './dto/series.dto';
+import { User } from '../user/user.model';
 
 @Injectable()
 export class SeriesService {
   constructor(
-    @InjectModel(Series.name) private seriesModel: Model<SeriesDocument>,
+    @InjectRepository(Series)
+    private seriesRepo: Repository<Series>,
   ) {}
 
   async getAll(): Promise<Series[]> {
-    return this.seriesModel.find().exec();
+    return this.seriesRepo.find(); // eager fetches user
   }
 
-  async create(createSeriesDto: CreateSeriesDto): Promise<Series> {
-    return this.seriesModel.create(createSeriesDto);
-  }
-  async update(
-    id: string,
-    updateSeriesDto: UpdateSeriesDto,
-  ): Promise<Series | null> {
-    return this.seriesModel.findByIdAndUpdate(id, updateSeriesDto, {
-      new: true,
-    });
+  async create(createDto: CreateSeriesDto, user: User): Promise<Series> {
+    const series = this.seriesRepo.create({ ...createDto, createdBy: user });
+    return await this.seriesRepo.save(series);
   }
 
-  async delete(id: string): Promise<null> {
-    return this.seriesModel.findByIdAndDelete(id);
+  async update(id: number, updateDto: UpdateSeriesDto): Promise<Series> {
+    await this.seriesRepo
+      .createQueryBuilder()
+      .update(Series)
+      .set(updateDto)
+      .where('id = :id', { id })
+      .execute();
+
+    const updated = await this.seriesRepo.findOne({ where: { id } });
+    if (!updated) throw new NotFoundException('Series not found');
+    return updated;
+  }
+
+  async delete(id: number): Promise<void> {
+    const result = await this.seriesRepo
+      .createQueryBuilder()
+      .delete()
+      .from(Series)
+      .where('id = :id', { id })
+      .execute();
+
+    if (result.affected === 0) throw new NotFoundException('Series not found');
   }
 }

@@ -1,66 +1,76 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { User, UserDocument } from './user.model';
+import { Injectable, NotFoundException, ConflictException, InternalServerErrorException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from './user.model';
 import { CreateUserDto, LoginUserDto, UpdateUserDto } from './dto/user.dto';
 import { generateToken } from '../utils/generateToken';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>,
   ) {}
 
   async register(createUserDto: CreateUserDto): Promise<string> {
-    const user = await this.userModel.create(createUserDto);
-
-    const token = generateToken({
-      _id: user._id,
-      email: user.email,
-    });
-
-    return token;
+  try {
+    const user = this.userRepo.create(createUserDto);
+    await this.userRepo.save(user);
+    return generateToken({ id: user.id, email: user.email });
+  } catch (error) {
+    if (error.code === '23505') { 
+      throw new ConflictException('Email already exists');
+    }
+    throw new InternalServerErrorException();
   }
+}
+
   async login(loginUserDto: LoginUserDto): Promise<string> {
     const { email, password } = loginUserDto;
 
-    const user = await this.userModel.findOne({ email }).select('+password');
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+    const user = await this.userRepo
+      .createQueryBuilder('user')
+      .addSelect('user.password') 
+      .where('user.email = :email', { email })
+      .getOne();
 
-    if (user.password !== password) {
+    if (!user || user.password !== password) {
       throw new NotFoundException('Invalid credentials');
     }
 
-    const token = generateToken({
-      _id: user._id,
-      email: user.email,
-    });
-
-    return token;
+    return generateToken({ id: user.id, email: user.email });
   }
 
   async findAll(): Promise<User[]> {
-    return this.userModel.find().exec();
+    return this.userRepo.find();
   }
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const updatedUser = await this.userModel.findByIdAndUpdate(
-      id,
-      updateUserDto,
-      { new: true },
-    );
+
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+    await this.userRepo
+      .createQueryBuilder()
+      .update(User)
+      .set(updateUserDto)
+      .where('id = :id', { id })
+      .execute();
+
+    const updatedUser = await this.userRepo.findOne({ where: { id } });
     if (!updatedUser) {
       throw new NotFoundException('User not found');
     }
+
     return updatedUser;
   }
 
-  async delete(id: string): Promise<User> {
-    const deletedUser = await this.userModel.findByIdAndDelete(id);
-    if (!deletedUser) {
+  async delete(id: number): Promise<void> {
+    const result = await this.userRepo
+      .createQueryBuilder()
+      .delete()
+      .from(User)
+      .where('id = :id', { id })
+      .execute();
+
+    if (result.affected === 0) {
       throw new NotFoundException('User not found');
     }
-    return deletedUser;
   }
 }

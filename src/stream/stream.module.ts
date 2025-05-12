@@ -1,14 +1,12 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { StreamController } from './stream.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Stream } from './stream.model';
 import { StreamService } from './stream.service';
-import { Stream, StreamSchema } from './stream.model';
+import { StreamController } from './stream.controller';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([{ name: Stream.name, schema: StreamSchema }]),
-  ],
-  controllers: [StreamController],
+  imports: [TypeOrmModule.forFeature([Stream])],
   providers: [StreamService],
+  controllers: [StreamController],
 })
 export class StreamModule {}

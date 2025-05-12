@@ -1,18 +1,20 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Episode } from '../episode/episode.model';
 
-export type SeasonDocument = Season & Document;
-
-@Schema()
+@Entity()
 export class Season {
-  @Prop({ required: true })
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
   seriesId: string;
 
-  @Prop({ required: true })
+  @Column()
   seasonNumber: number;
 
-  @Prop({ required: true, maxlength: 100 })
+  @Column({ length: 100 })
   title: string;
-}
 
-export const SeasonSchema = SchemaFactory.createForClass(Season);
+  @OneToMany(() => Episode, (episode) => episode.season)
+  episodes: Episode[];
+}

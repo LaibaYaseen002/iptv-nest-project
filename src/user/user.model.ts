@@ -1,18 +1,27 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
-
-export type UserDocument = User & Document;
-
-@Schema()
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Series } from '../series/series.model'; 
+import { Stream } from '../stream/stream.model';
+import { File } from '../file/file.model';
+@Entity()
 export class User {
-  @Prop({ required: true })
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
   name: string;
 
-  @Prop({ required: true, unique: true })
+  @Column({ unique: true })
   email: string;
 
-  @Prop({ required: true, select: false })
+  @Column({ select: false })
   password: string;
-}
 
-export const UserSchema = SchemaFactory.createForClass(User);
+  @OneToMany(() => Series, (series) => series.createdBy)
+  series: Series[];
+
+  @OneToMany(() => Stream, (stream) => stream.createdBy)
+  streams: Stream[];
+
+  @OneToMany(() => File, (file) => file.uploadedBy)
+  files: File[];
+}

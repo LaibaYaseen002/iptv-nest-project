@@ -1,37 +1,45 @@
 import {
   Controller,
-  Get,
   Post,
+  Get,
   Body,
-  Patch,
   Param,
   Delete,
+  Put,
+  UseGuards,
 } from '@nestjs/common';
 import { StreamService } from './stream.service';
 import { CreateStreamDto, UpdateStreamDto } from './dto/stream.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { User } from '../auth/user.decorator';
+import { User as UserEntity } from '../user/user.model';
+import { ParseIntPipe } from '@nestjs/common';
 
-@Controller('stream')
+@Controller('streams')
 export class StreamController {
   constructor(private readonly streamService: StreamService) {}
 
   @Get()
-  async getAll() {
+  getAll() {
     return this.streamService.getAll();
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Post('create')
-  async create(@Body() createStreamDto: CreateStreamDto) {
-    return this.streamService.create(createStreamDto);
+  create(@Body() body: CreateStreamDto, @User() user: UserEntity) {
+    return this.streamService.create(body, user);
   }
-  async update(
-    @Param('id') id: string,
-    @Body() updateStreamDto: UpdateStreamDto,
+
+  @Put(':id')
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: UpdateStreamDto
   ) {
-    return this.streamService.update(id, updateStreamDto);
+    return this.streamService.update(id, body);
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: string) {
+  delete(@Param('id', ParseIntPipe) id: number) {
     return this.streamService.delete(id);
   }
 }

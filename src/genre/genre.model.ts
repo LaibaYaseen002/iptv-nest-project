@@ -1,12 +1,26 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
+import { Series } from '../series/series.model';
+import { Stream } from '../stream/stream.model';
 
-export type GenreDocument = Genre & Document;
-
-@Schema()
+@Entity()
 export class Genre {
-  @Prop({ required: true, maxlength: 50 })
-  name: string;
-}
+  @PrimaryGeneratedColumn()
+  id: number;
 
-export const GenreSchema = SchemaFactory.createForClass(Genre);
+  @Column()
+  name: string;
+
+  @ManyToMany(() => Series, (series) => series.genres)
+  @JoinTable()
+  series: Series[];
+
+  @ManyToMany(() => Stream, (stream) => stream.genres)
+  @JoinTable()
+  streams: Stream[];
+}

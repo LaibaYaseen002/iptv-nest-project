@@ -25,7 +25,7 @@ export class EpisodeController {
   }
   @Patch(':id')
   async update(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() updateEpisodeDto: UpdateEpisodeDto,
   ) {
     return this.episodeService.update(id, updateEpisodeDto);

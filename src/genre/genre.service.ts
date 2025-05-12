@@ -1,30 +1,61 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Genre, GenreDocument } from './genre.model';
-import { CreateGenreDto, UpdateGenreDto } from './dto/genre.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Genre } from './genre.model';
+import { Series } from '../series/series.model';
+import { Stream } from '../stream/stream.model';
+import { CreateGenreDto } from './dto/genre.dto';
 
 @Injectable()
 export class GenreService {
   constructor(
-    @InjectModel(Genre.name) private genreModel: Model<GenreDocument>,
+    @InjectRepository(Genre)
+    private genreRepo: Repository<Genre>,
+
+    @InjectRepository(Series)
+    private seriesRepo: Repository<Series>, 
+
+    @InjectRepository(Stream)
+    private streamRepo: Repository<Stream>, 
   ) {}
 
+  
+  async create(dto: CreateGenreDto): Promise<Genre> {
+    const genre = this.genreRepo.create({ name: dto.name });
+
+    
+    if (dto.seriesIds?.length) {
+      const series = await this.seriesRepo.findByIds(dto.seriesIds);
+      genre.series = series;
+    }
+
+    
+    if (dto.streamIds?.length) {
+      const streams = await this.streamRepo.findByIds(dto.streamIds);
+      genre.streams = streams;
+    }
+
+    return this.genreRepo.save(genre);
+  }
+
+  
   async getAll(): Promise<Genre[]> {
-    return this.genreModel.find().exec();
+    return this.genreRepo.find({
+      relations: ['series', 'streams'],  
+    });
   }
 
-  async create(createGenreDto: CreateGenreDto): Promise<Genre> {
-    return this.genreModel.create(createGenreDto);
-  }
-  async update(
-    id: string,
-    updateGenreDto: UpdateGenreDto,
-  ): Promise<Genre | null> {
-    return this.genreModel.findByIdAndUpdate(id, updateGenreDto, { new: true });
-  }
+  
+  async getById(id: number): Promise<Genre> {
+    const genre = await this.genreRepo.findOne({
+      where: { id },
+      relations: ['series', 'streams'],  
+    });
 
-  async delete(id: string): Promise<null> {
-    return this.genreModel.findByIdAndDelete(id);
+    if (!genre) {
+      throw new Error('Genre not found');
+    }
+
+    return genre;
   }
 }

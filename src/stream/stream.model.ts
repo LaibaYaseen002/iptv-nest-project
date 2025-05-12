@@ -1,21 +1,32 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  ManyToMany,
+  CreateDateColumn,
+} from 'typeorm';
+import { User } from '../user/user.model';
+import { Genre } from '../genre/genre.model';
 
-export type StreamDocument = Stream & Document;
-
-@Schema()
+@Entity()
 export class Stream {
-  @Prop({ required: true })
-  episodeId: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-  @Prop({ required: true })
+  @Column()
   title: string;
 
-  @Prop({ required: true, enum: ['360p', '480p', '720p', '1080p', '4K'] })
-  quality: string;
+  @Column({ nullable: true })
+  description: string;
 
-  @Prop({ required: true })
-  streamingPlatform: string;
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @ManyToOne(() => User, (user) => user.streams, { eager: true })
+  createdBy: User;
+
+  @ManyToMany(() => Genre, (genre) => genre.streams, { eager: true })
+  genres: Genre[];
 }
 
-export const StreamSchema = SchemaFactory.createForClass(Stream);

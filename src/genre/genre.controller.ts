@@ -1,38 +1,31 @@
 import {
   Controller,
-  Get,
   Post,
-  Body,
-  Patch,
-  Param,
+  Get,
   Delete,
+  Param,
+  Body,
+  ParseIntPipe,
 } from '@nestjs/common';
-import { GenreService } from './genre.service';
-import { CreateGenreDto, UpdateGenreDto } from './dto/genre.dto';
+import { GenreSeriesService } from '../genreSeries/genreSeries.service';
+import { CreateGenreDto } from './dto/genre.dto';
 
-@Controller('genre')
+@Controller('genres')
 export class GenreController {
-  constructor(private readonly genreService: GenreService) {}
+  constructor(private readonly genreService: GenreSeriesService) {}
 
   @Get()
-  async getAll() {
+  getAllGenres() {
     return this.genreService.getAll();
   }
 
-  @Post('create')
-  async create(@Body() createGenreDto: CreateGenreDto) {
-    return this.genreService.create(createGenreDto);
-  }
-  @Patch(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() updateGenreDto: UpdateGenreDto,
-  ) {
-    return this.genreService.update(id, updateGenreDto);
+  @Post()
+  createGenre(@Body() dto: CreateGenreDto) {
+    return this.genreService.create(dto);
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: string) {
+  deleteGenre(@Param('id', ParseIntPipe) id: number) {
     return this.genreService.delete(id);
   }
 }

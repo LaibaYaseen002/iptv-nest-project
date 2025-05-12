@@ -1,18 +1,12 @@
-import { IsNotEmpty, IsString, IsOptional, IsDate } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsString, IsOptional } from 'class-validator';
+
 export class CreateSeriesDto {
-  @IsNotEmpty()
   @IsString()
   title: string;
 
   @IsOptional()
   @IsString()
   description?: string;
-
-  @IsOptional()
-  @IsDate()
-  @Type(() => Date)
-  releaseDate?: Date;
 }
 
 export class UpdateSeriesDto {
@@ -23,9 +17,4 @@ export class UpdateSeriesDto {
   @IsOptional()
   @IsString()
   description?: string;
-
-  @IsOptional()
-  @IsDate()
-  @Type(() => Date)
-  releaseDate?: Date;
 }

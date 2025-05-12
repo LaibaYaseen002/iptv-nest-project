@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { GenreModule } from './genre/genre.module';
 import { SeriesModule } from './series/series.module';
@@ -8,12 +8,19 @@ import { EpisodeModule } from './episode/episode.module';
 import { StreamModule } from './stream/stream.module';
 import { FileModule } from './file/file.module';
 import { GenreSeriesModule } from './genreSeries/genreSeries.module';
-
 @Module({
   imports: [
-    MongooseModule.forRoot(
-      'mongodb+srv://user:user123@cluster0.uogjtlx.mongodb.net/nestjs',
-    ),
+    TypeOrmModule.forRoot({
+  type: 'postgres', 
+  host: 'localhost',
+  port: 5432,
+  username: 'postgres',
+  password: 'postgresql',
+  database: 'mydb',
+  entities: [__dirname + '/**/*.model{.ts,.js}'], 
+  synchronize: true,
+}),
+
     UserModule,
     GenreModule,
     SeriesModule,

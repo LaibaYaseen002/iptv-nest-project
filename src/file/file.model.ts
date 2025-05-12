@@ -1,24 +1,30 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  CreateDateColumn,
+} from 'typeorm';
+import { User } from '../user/user.model';
 
-export type FileDocument = File & Document;
-
-@Schema()
+@Entity()
 export class File {
-  @Prop({ required: true })
-  title: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-  @Prop({ required: true })
+  @Column()
   filename: string;
 
-  @Prop({ required: true })
-  path: string;
+  @Column()
+  fileType: string;
 
-  @Prop({ required: true })
-  size: number;
+  @Column()
+  url: string;
 
-  @Prop({ default: Date.now })
+  @CreateDateColumn()
   uploadedAt: Date;
+
+  @ManyToOne(() => User, (user) => user.files, { eager: true })
+  uploadedBy: User;
 }
 
-export const FileSchema = SchemaFactory.createForClass(File);

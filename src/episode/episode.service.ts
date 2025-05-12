@@ -1,32 +1,57 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Episode, EpisodeDocument } from './episode.model';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Episode } from './episode.model';
 import { CreateEpisodeDto, UpdateEpisodeDto } from './dto/episode.dto';
 
 @Injectable()
 export class EpisodeService {
   constructor(
-    @InjectModel(Episode.name) private episodeModel: Model<EpisodeDocument>,
+    @InjectRepository(Episode)
+    private episodeRepository: Repository<Episode>,
   ) {}
 
   async getAll(): Promise<Episode[]> {
-    return this.episodeModel.find().exec();
+    return this.episodeRepository.find({ relations: ['season'] });
+  }
+
+  async getOne(id: number): Promise<Episode> {
+    const episode = await this.episodeRepository.findOne({
+      where: { id },
+      relations: ['season'],
+    });
+
+    if (!episode) {
+      throw new NotFoundException(`Episode with ID ${id} not found`);
+    }
+
+    return episode;
   }
 
   async create(createEpisodeDto: CreateEpisodeDto): Promise<Episode> {
-    return this.episodeModel.create(createEpisodeDto);
-  }
-  async update(
-    id: string,
-    updateEpisodeDto: UpdateEpisodeDto,
-  ): Promise<Episode | null> {
-    return this.episodeModel.findByIdAndUpdate(id, updateEpisodeDto, {
-      new: true,
-    });
+    const episode = this.episodeRepository.create(createEpisodeDto);
+    return this.episodeRepository.save(episode);
   }
 
-  async delete(id: string): Promise<null> {
-    return this.episodeModel.findByIdAndDelete(id);
+  async update(id: number, updateEpisodeDto: UpdateEpisodeDto): Promise<Episode> {
+    const episode = await this.episodeRepository.findOne({
+      where: { id },
+      relations: ['season'],
+    });
+
+    if (!episode) {
+      throw new NotFoundException(`Episode with ID ${id} not found`);
+    }
+
+    Object.assign(episode, updateEpisodeDto);
+    return this.episodeRepository.save(episode);
+  }
+
+  async delete(id: string): Promise<void> {
+    const result = await this.episodeRepository.delete(id);
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`Episode with ID ${id} not found`);
+    }
   }
 }

@@ -1,25 +1,29 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { File, FileDocument } from './file.model';
-import { CreateFileDto, UpdateFileDto } from './dto/file.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { File } from './file.model';
+import { CreateFileDto } from './dto/file.dto';
+import { User } from '../user/user.model';
 
 @Injectable()
 export class FileService {
-  constructor(@InjectModel(File.name) private fileModel: Model<FileDocument>) {}
+  constructor(
+    @InjectRepository(File)
+    private fileRepo: Repository<File>,
+  ) {}
 
   async getAll(): Promise<File[]> {
-    return this.fileModel.find().exec();
+    return this.fileRepo.find();
   }
 
-  async create(createFileDto: CreateFileDto): Promise<File> {
-    return this.fileModel.create(createFileDto);
-  }
-  async update(id: string, updateFileDto: UpdateFileDto): Promise<File | null> {
-    return this.fileModel.findByIdAndUpdate(id, updateFileDto, { new: true });
-  }
+  async create(fileMeta: { filename: string; fileType: string; url: string }, user: User): Promise<File> {
+  const file = this.fileRepo.create({ ...fileMeta, uploadedBy: user });
+  return this.fileRepo.save(file);
+}
 
-  async delete(id: string): Promise<null> {
-    return this.fileModel.findByIdAndDelete(id);
+
+  async delete(id: number): Promise<void> {
+    const result = await this.fileRepo.delete({ id });
+    if (result.affected === 0) throw new NotFoundException('File not found');
   }
 }

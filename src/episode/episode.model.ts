@@ -1,24 +1,26 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Season } from '../season/season.model';
 
-export type EpisodeDocument = Episode & Document;
-
-@Schema()
+@Entity()
 export class Episode {
-  @Prop({ required: true })
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
   seasonId: string;
 
-  @Prop({ required: true })
+  @ManyToOne(() => Season, (season) => season.episodes)
+  season: Season;
+
+  @Column()
   episodeNumber: number;
 
-  @Prop({ required: true, maxlength: 100 })
+  @Column({ length: 100 })
   title: string;
 
-  @Prop({ required: true })
+  @Column()
   seasonNumber: number;
 
-  @Prop({ required: true })
-  duration: number; // duration in minutes
+  @Column()
+  duration: number; 
 }
-
-export const EpisodeSchema = SchemaFactory.createForClass(Episode);

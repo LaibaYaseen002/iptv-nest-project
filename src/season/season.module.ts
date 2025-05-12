@@ -1,13 +1,11 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+import {TypeOrmModule } from '@nestjs/typeorm';
 import { SeasonController } from './season.controller';
 import { SeasonService } from './season.service';
-import { Season, SeasonSchema } from './season.model';
+import { Season } from './season.model';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([{ name: Season.name, schema: SeasonSchema }]),
-  ],
+  imports: [TypeOrmModule.forFeature([Season])],
   controllers: [SeasonController],
   providers: [SeasonService],
 })

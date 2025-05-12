@@ -27,11 +27,11 @@ export class SeasonController {
     @Param('id') id: string,
     @Body() updateSeasonDto: UpdateSeasonDto,
   ) {
-    return this.seasonService.update(id, updateSeasonDto);
+    return this.seasonService.update(+id, updateSeasonDto);
   }
 
   @Delete(':id')
   async delete(@Param('id') id: string) {
-    return this.seasonService.delete(id);
+    return this.seasonService.delete(+id);
   }
 }

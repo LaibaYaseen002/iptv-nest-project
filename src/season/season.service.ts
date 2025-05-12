@@ -1,32 +1,43 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Season, SeasonDocument } from './season.model';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Season } from './season.model';
 import { CreateSeasonDto, UpdateSeasonDto } from './dto/season.dto';
 
 @Injectable()
 export class SeasonService {
   constructor(
-    @InjectModel(Season.name) private seasonModel: Model<SeasonDocument>,
+    @InjectRepository(Season)
+    private seasonRepository: Repository<Season>,
   ) {}
 
   async getAll(): Promise<Season[]> {
-    return this.seasonModel.find().exec();
+    return this.seasonRepository.find({ relations: ['episode'] });
   }
 
   async create(createSeasonDto: CreateSeasonDto): Promise<Season> {
-    return this.seasonModel.create(createSeasonDto);
-  }
-  async update(
-    id: string,
-    updateSeasonDto: UpdateSeasonDto,
-  ): Promise<Season | null> {
-    return this.seasonModel.findByIdAndUpdate(id, updateSeasonDto, {
-      new: true,
-    });
+    const season = this.seasonRepository.create(createSeasonDto);
+    return this.seasonRepository.save(season);
   }
 
-  async delete(id: string): Promise<null> {
-    return this.seasonModel.findByIdAndDelete(id);
+  async update(
+    id: number,
+    updateSeasonDto: UpdateSeasonDto,
+  ): Promise<Season> {
+    const season = await this.seasonRepository.findOne({
+      where: { id },
+      relations: ['episode'],
+    });
+
+    if (!season) {
+      throw new NotFoundException(`Season with ID ${id} not found`);
+    }
+
+    Object.assign(season, updateSeasonDto);
+    return this.seasonRepository.save(season);
+  }
+
+  async delete(id: number): Promise<void> {
+    await this.seasonRepository.delete(id);
   }
 }

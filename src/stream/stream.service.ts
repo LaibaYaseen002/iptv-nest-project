@@ -1,32 +1,35 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Stream, StreamDocument } from './stream.model';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Stream } from './stream.model';
 import { CreateStreamDto, UpdateStreamDto } from './dto/stream.dto';
+import { User } from '../user/user.model';
 
 @Injectable()
 export class StreamService {
   constructor(
-    @InjectModel(Stream.name) private streamModel: Model<StreamDocument>,
+    @InjectRepository(Stream)
+    private streamRepo: Repository<Stream>,
   ) {}
 
   async getAll(): Promise<Stream[]> {
-    return this.streamModel.find().exec();
+    return this.streamRepo.find();
   }
 
-  async create(createStreamDto: CreateStreamDto): Promise<Stream> {
-    return this.streamModel.create(createStreamDto);
-  }
-  async update(
-    id: string,
-    updateStreamDto: UpdateStreamDto,
-  ): Promise<Stream | null> {
-    return this.streamModel.findByIdAndUpdate(id, updateStreamDto, {
-      new: true,
-    });
+  async create(createDto: CreateStreamDto, user: User): Promise<Stream> {
+    const stream = this.streamRepo.create({ ...createDto, createdBy: user });
+    return this.streamRepo.save(stream);
   }
 
-  async delete(id: string): Promise<null> {
-    return this.streamModel.findByIdAndDelete(id);
+  async update(id: number, updateDto: UpdateStreamDto): Promise<Stream> {
+    await this.streamRepo.update({ id }, updateDto);
+    const updated = await this.streamRepo.findOne({ where: { id } });
+    if (!updated) throw new NotFoundException('Stream not found');
+    return updated;
+  }
+
+  async delete(id: number): Promise<void> {
+    const result = await this.streamRepo.delete({ id });
+    if (result.affected === 0) throw new NotFoundException('Stream not found');
   }
 }

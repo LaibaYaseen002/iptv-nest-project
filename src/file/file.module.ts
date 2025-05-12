@@ -1,14 +1,13 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { FileController } from './file.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { File } from './file.model';
 import { FileService } from './file.service';
-import { File, FileSchema } from './file.model';
+import { FileController } from './file.controller';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([{ name: File.name, schema: FileSchema }]),
-  ],
-  controllers: [FileController],
+  imports: [TypeOrmModule.forFeature([File])],
   providers: [FileService],
+  controllers: [FileController],
 })
 export class FileModule {}
+

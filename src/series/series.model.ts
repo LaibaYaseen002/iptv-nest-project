@@ -1,18 +1,31 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  ManyToMany,
+  CreateDateColumn,
+} from 'typeorm';
+import { User } from '../user/user.model';
+import { Genre } from '../genre/genre.model';
 
-export type SeriesDocument = Series & Document;
-
-@Schema()
+@Entity()
 export class Series {
-  @Prop({ required: true, maxlength: 100 })
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
   title: string;
 
-  @Prop({ maxlength: 500 })
+  @Column({ nullable: true })
   description: string;
 
-  @Prop()
-  releaseDate: Date;
-}
+  @CreateDateColumn()
+  createdAt: Date;
 
-export const SeriesSchema = SchemaFactory.createForClass(Series);
+  @ManyToOne(() => User, (user) => user.series, { eager: true })
+  createdBy: User;
+
+  @ManyToMany(() => Genre, (genre) => genre.series, { eager: true })
+  genres: Genre[];
+}
