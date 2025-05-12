@@ -3,9 +3,11 @@ import {
   PrimaryGeneratedColumn,
   Column,
   OneToMany,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
-import { Series } from '../series/series.model'
-
+import { Series } from '../series/series.model';
+import { Genre } from '../genre/genre.model';
 @Entity()
 export class GenreSeries {
   @PrimaryGeneratedColumn()
@@ -14,6 +16,11 @@ export class GenreSeries {
   @Column()
   name: string;
 
-  @OneToMany(() => Series, series => series.genres)
+  @ManyToOne(() => Series, series => series.genreSeries)
+  @JoinColumn({ name: 'series_id'})
   series: Series[];
+
+  @ManyToOne(() => Genre, (genre) => genre.genreSeries)
+  @JoinColumn({ name: 'genre_id' })
+  genre: Genre; 
 }

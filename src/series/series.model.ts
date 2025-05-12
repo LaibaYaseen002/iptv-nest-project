@@ -5,9 +5,11 @@ import {
   ManyToOne,
   ManyToMany,
   CreateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { User } from '../user/user.model';
 import { Genre } from '../genre/genre.model';
+import { GenreSeries } from 'src/genreSeries/genreSeries.model';
 
 @Entity()
 export class Series {
@@ -28,4 +30,7 @@ export class Series {
 
   @ManyToMany(() => Genre, (genre) => genre.series, { eager: true })
   genres: Genre[];
+
+  @OneToMany(() => GenreSeries, (genreSeries) => genreSeries.series)
+  genreSeries: GenreSeries[];
 }

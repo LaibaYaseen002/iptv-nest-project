@@ -3,11 +3,12 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToMany,
+  OneToMany,
   JoinTable,
 } from 'typeorm';
 import { Series } from '../series/series.model';
 import { Stream } from '../stream/stream.model';
-
+import { GenreSeries } from '../genreSeries/genreSeries.model'
 @Entity()
 export class Genre {
   @PrimaryGeneratedColumn()
@@ -23,4 +24,7 @@ export class Genre {
   @ManyToMany(() => Stream, (stream) => stream.genres)
   @JoinTable()
   streams: Stream[];
+
+  @OneToMany(() => GenreSeries, genreSeries => genreSeries.genre)
+  genreSeries: GenreSeries[];
 }
