@@ -8,6 +8,9 @@ import { EpisodeModule } from './episode/episode.module';
 import { StreamModule } from './stream/stream.module';
 import { FileModule } from './file/file.module';
 import { GenreSeriesModule } from './genreSeries/genreSeries.module';
+import { JwtStrategy } from './auth/jwt.strategy'; 
+import { PassportModule } from '@nestjs/passport';
+
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -29,6 +32,8 @@ import { GenreSeriesModule } from './genreSeries/genreSeries.module';
     StreamModule,
     FileModule,
     GenreSeriesModule,
+    PassportModule,
   ],
+  providers: [JwtStrategy],
 })
 export class AppModule {}
