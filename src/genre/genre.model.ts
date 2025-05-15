@@ -22,7 +22,7 @@ export class Genre {
   series: Series[];
 
   @ManyToMany(() => Stream, (stream) => stream.genres)
-  @JoinTable()
+
   streams: Stream[];
 
   @OneToMany(() => GenreSeries, genreSeries => genreSeries.genre)

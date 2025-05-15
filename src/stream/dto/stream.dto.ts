@@ -1,4 +1,4 @@
-import { IsString, IsOptional } from 'class-validator';
+import { IsString, IsOptional, IsArray, IsNumber } from 'class-validator';
 
 export class CreateStreamDto {
   @IsString()
@@ -7,6 +7,11 @@ export class CreateStreamDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+    @IsOptional()
+  @IsArray()
+  @IsNumber({}, { each: true }) 
+  genreIds?: number[];
 }
 
 export class UpdateStreamDto {

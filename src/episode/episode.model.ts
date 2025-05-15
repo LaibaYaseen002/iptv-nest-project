@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Season } from '../season/season.model';
 
 @Entity()
@@ -7,12 +7,13 @@ export class Episode {
   id: number;
 
   @Column()
-  seasonId: string;
+  seasonId: number;
 
   @ManyToOne(() => Season, (season) => season.episodes)
+  @JoinColumn({ name: 'seasonId' })
   season: Season;
 
-  @Column()
+  @Column({ type: 'int', nullable: true })
   episodeNumber: number;
 
   @Column({ length: 100 })

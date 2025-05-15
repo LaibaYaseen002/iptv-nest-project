@@ -4,12 +4,16 @@ import { Repository } from 'typeorm';
 import { Stream } from './stream.model';
 import { CreateStreamDto, UpdateStreamDto } from './dto/stream.dto';
 import { User } from '../user/user.model';
-
+import { Genre } from '../genre/genre.model';
 @Injectable()
 export class StreamService {
   constructor(
     @InjectRepository(Stream)
     private streamRepo: Repository<Stream>,
+
+     @InjectRepository(Genre)
+  private genreRepo: Repository<Genre>,
+
   ) {}
 
   async getAll(): Promise<Stream[]> {
@@ -17,7 +21,18 @@ export class StreamService {
   }
 
   async create(createDto: CreateStreamDto, user: User): Promise<Stream> {
-    const stream = this.streamRepo.create({ ...createDto, createdBy: user });
+let genres: Genre[] = [];
+
+  if (createDto.genreIds) {
+    genres = await this.genreRepo.findByIds(createDto.genreIds);
+  }
+
+
+    const stream = this.streamRepo.create({ ...createDto,
+       createdBy: user,
+        genres,
+
+     });
     return this.streamRepo.save(stream);
   }
 
@@ -33,3 +48,4 @@ export class StreamService {
     if (result.affected === 0) throw new NotFoundException('Stream not found');
   }
 }
+

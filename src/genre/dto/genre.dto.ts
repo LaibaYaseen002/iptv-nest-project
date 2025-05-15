@@ -14,3 +14,16 @@ export class CreateGenreDto {
   streamIds?: number[];
 }
 
+ export class UpdateGenreDto {
+    @IsOptional()
+    @IsString()
+    name?: string;
+
+    @IsOptional()
+    @IsArray()
+    seriesIds?: number[];
+    
+    @IsOptional()
+    @IsArray()
+    streamIds?: number[];
+  }

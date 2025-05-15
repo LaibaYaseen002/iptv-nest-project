@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { GenreSeries } from '../genreSeries/genreSeries.model';
 import { Series } from '../series/series.model';
 import { CreateGenreDto } from './dto/genreSeries.dto';
+import { Genre } from '../genre/genre.model';
 
 @Injectable()
 export class GenreSeriesService {
@@ -13,21 +14,56 @@ export class GenreSeriesService {
 
     @InjectRepository(Series)
     private seriesRepo: Repository<Series>,
+
+    @InjectRepository(Genre)
+    private genreRepo: Repository<Genre>,
   ) {}
 
   async getAll(): Promise<GenreSeries[]> {
-    return this.genreSeriesRepo.find({ relations: ['series'] });
+    return this.genreSeriesRepo.find({ relations: ['series', 'genre'] });
   }
 
   async create(dto: CreateGenreDto): Promise<GenreSeries> {
-    const genre = this.genreSeriesRepo.create({ name: dto.name });
+    const genre = await this.genreRepo.findOneBy({ id: dto.genreId });
+    const series = await this.seriesRepo.findOneBy({ id: dto.seriesIds})
+    
+    if (!series) throw new NotFoundException('Series not found');
+    if (!genre) throw new NotFoundException('Genre not found');
 
-    if (dto.seriesIds && dto.seriesIds.length > 0) {
-      const series = await this.seriesRepo.findByIds(dto.seriesIds);
-      genre.series = series;
+    const genreSeries = this.genreSeriesRepo.create({
+      name: dto.name,
+      series,
+      genre,
+    })
+
+     return this.genreSeriesRepo.save(genreSeries);
     }
 
-    return this.genreSeriesRepo.save(genre);
+  async update(id: number, dto: CreateGenreDto): Promise<GenreSeries> {
+    
+    const genreSeries = await this.genreSeriesRepo.findOne({ where: { id } });
+
+    if (!genreSeries) {
+      throw new NotFoundException(`GenreSeries with id ${id} not found`);
+    }
+
+    
+    await this.genreSeriesRepo
+      .createQueryBuilder()
+      .update(GenreSeries)
+      .set({ name: dto.name }) 
+      .where('id = :id', { id }) 
+      .execute();
+
+   
+    if (dto.seriesIds) {
+      const series = await this.seriesRepo.findOneBy({ id: dto.seriesIds});
+      if (!series) throw new NotFoundException('Series not found');
+      genreSeries.series = series;
+    }
+
+    
+    return this.genreSeriesRepo.save(genreSeries);
   }
 
   async delete(id: number): Promise<void> {

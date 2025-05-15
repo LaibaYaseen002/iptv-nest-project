@@ -4,6 +4,7 @@ import {
   Get,
   Body,
   Delete,
+  Put,
   Param,
   ParseIntPipe,
 } from '@nestjs/common';
@@ -20,8 +21,16 @@ export class GenreSeriesController {
   }
 
   @Post()
-  create(@Body() body: CreateGenreDto) {
+  createGenreSeries(@Body() body: CreateGenreDto) {
     return this.genreSeriesService.create(body);
+  }
+
+@Put(':id')
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: CreateGenreDto
+  ) {
+    return this.genreSeriesService.update(id, body);
   }
 
   @Delete(':id')

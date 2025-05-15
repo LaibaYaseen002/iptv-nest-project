@@ -1,13 +1,13 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
 import { Episode } from '../episode/episode.model';
-
+import { Series } from '../series/series.model';
 @Entity()
 export class Season {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  seriesId: string;
+  seriesId: number;
 
   @Column()
   seasonNumber: number;
@@ -17,4 +17,8 @@ export class Season {
 
   @OneToMany(() => Episode, (episode) => episode.season)
   episodes: Episode[];
+
+   @ManyToOne(() => Series, (series) => series.seasons)
+   @JoinColumn({ name: 'seriesId' })
+   series: Series;
 }

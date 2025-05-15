@@ -12,7 +12,7 @@ export class SeasonService {
   ) {}
 
   async getAll(): Promise<Season[]> {
-    return this.seasonRepository.find({ relations: ['episode'] });
+    return this.seasonRepository.find({ relations: ['episodes'] });
   }
 
   async create(createSeasonDto: CreateSeasonDto): Promise<Season> {
@@ -26,7 +26,7 @@ export class SeasonService {
   ): Promise<Season> {
     const season = await this.seasonRepository.findOne({
       where: { id },
-      relations: ['episode'],
+      relations: ['episodes'],
     });
 
     if (!season) {

@@ -5,6 +5,7 @@ import {
   OneToMany,
   ManyToOne,
   JoinColumn,
+  ManyToMany,
 } from 'typeorm';
 import { Series } from '../series/series.model';
 import { Genre } from '../genre/genre.model';
@@ -18,7 +19,7 @@ export class GenreSeries {
 
   @ManyToOne(() => Series, series => series.genreSeries)
   @JoinColumn({ name: 'series_id'})
-  series: Series[];
+  series: Series;
 
   @ManyToOne(() => Genre, (genre) => genre.genreSeries)
   @JoinColumn({ name: 'genre_id' })

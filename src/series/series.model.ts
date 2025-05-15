@@ -10,6 +10,7 @@ import {
 import { User } from '../user/user.model';
 import { Genre } from '../genre/genre.model';
 import { GenreSeries } from 'src/genreSeries/genreSeries.model';
+import { Season } from '../season/season.model';
 
 @Entity()
 export class Series {
@@ -33,4 +34,7 @@ export class Series {
 
   @OneToMany(() => GenreSeries, (genreSeries) => genreSeries.series)
   genreSeries: GenreSeries[];
+
+  @OneToMany(() => Season, (season) => season.series)
+  seasons: Season[];
 }

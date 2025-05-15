@@ -7,5 +7,8 @@ export class CreateGenreDto {
   @IsOptional()
   @IsArray()
   @IsNumber({}, { each: true})
-  seriesIds?: number[];
+  seriesIds?: number;
+
+  @IsNumber()
+  genreId: number;
 }

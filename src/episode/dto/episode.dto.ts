@@ -2,12 +2,13 @@ import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
 
 export class CreateEpisodeDto {
   @IsNotEmpty()
-  @IsString()
-  seasonId: string;
+  @IsNumber()
+  seasonId: number;
 
   @IsNotEmpty()
   @IsNumber()
-  episodeNumber: number;
+  seasonNumber: number;
+
 
   @IsNotEmpty()
   @IsString()
@@ -15,16 +16,16 @@ export class CreateEpisodeDto {
 
   @IsNotEmpty()
   @IsNumber()
-  seasonNumber: number;
+  episodeNumber: number; 
 
   @IsNotEmpty()
   @IsNumber()
-  duration: number; // duration in minutes
+  duration: number; 
 }
 
 export class UpdateEpisodeDto {
-  @IsString()
-  seasonId?: string;
+  @IsNumber()
+  seasonId?: number;
 
   @IsNumber()
   episodeNumber?: number;

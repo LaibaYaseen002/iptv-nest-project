@@ -29,6 +29,7 @@ export class SeriesController {
     @Body() body: CreateSeriesDto,
     @User() user: UserEntity 
   ) {
+    console.log('Authenticated user:', user)
     return this.seriesService.create(body, user);
   }
 

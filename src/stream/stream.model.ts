@@ -5,6 +5,7 @@ import {
   ManyToOne,
   ManyToMany,
   CreateDateColumn,
+  JoinTable,
 } from 'typeorm';
 import { User } from '../user/user.model';
 import { Genre } from '../genre/genre.model';
@@ -27,6 +28,7 @@ export class Stream {
   createdBy: User;
 
   @ManyToMany(() => Genre, (genre) => genre.streams, { eager: true })
-  genres: Genre[];
+  @JoinTable()
+   genres: Genre[];
 }
 

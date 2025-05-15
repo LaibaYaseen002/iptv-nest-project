@@ -1,4 +1,4 @@
-import { IsString, IsOptional } from 'class-validator';
+import { IsString, IsOptional, IsNumber } from 'class-validator';
 
 export class CreateSeriesDto {
   @IsString()
@@ -7,6 +7,12 @@ export class CreateSeriesDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @IsNumber()
+  createdById: number;
+
+  @IsNumber()
+  genreIds: number[];
 }
 
 export class UpdateSeriesDto {

@@ -2,8 +2,8 @@ import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
 
 export class CreateSeasonDto {
   @IsNotEmpty()
-  @IsString()
-  seriesId: string;
+  @IsNumber()
+  seriesId: number;
 
   @IsNotEmpty()
   @IsNumber()
@@ -15,7 +15,7 @@ export class CreateSeasonDto {
 }
 
 export class UpdateSeasonDto {
-  @IsString()
+  @IsNumber()
   seriesId?: string;
 
   @IsNumber()
